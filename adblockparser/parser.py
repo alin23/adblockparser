@@ -79,7 +79,7 @@ class AdblockRule(object):
     OPTIONS_SPLIT_PAT = ',(?=~?(?:%s))' % ('|'.join(BINARY_OPTIONS + ["domain"]))
     OPTIONS_SPLIT_RE = re.compile(OPTIONS_SPLIT_PAT)
 
-    __slots__ = ['raw_rule_text', 'is_comment', 'is_html_rule', 'is_exception',
+    __slots__ = ['raw_rule_text', 'is_comment', 'is_html_rule', 'html_selector', 'is_exception',
                  'raw_options', 'options', '_options_keys', 'rule_text',
                  'regex', 'regex_re']
 
@@ -93,8 +93,8 @@ class AdblockRule(object):
             self.is_html_rule = self.is_exception = False
         else:
             self.is_html_rule = '##' in rule_text or '#@#' in rule_text  # or rule_text.startswith('#')
-            self.is_exception = rule_text.startswith('@@')
-            if self.is_exception:
+            self.is_exception = rule_text.startswith('@@') or '#@#' in rule_text
+            if self.is_exception and not self.is_html_rule:
                 rule_text = rule_text[2:]
 
         if not self.is_comment and '$' in rule_text:
@@ -108,11 +108,11 @@ class AdblockRule(object):
 
         self.rule_text = rule_text
 
-        if self.is_comment or self.is_html_rule:
-            # TODO: add support for HTML rules.
-            # We should split the rule into URL and HTML parts,
-            # convert URL part to a regex and parse the HTML part.
+        if self.is_comment:
             self.regex = ''
+        elif self.is_html_rule:
+            url, selector = rule_text.split('#@#' if self.is_exception else '##')
+            self.regex, self.html_selector = self.rule_to_regex(rule_text), selector
         else:
             self.regex = self.rule_to_regex(rule_text)
 
