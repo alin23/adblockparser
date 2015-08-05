@@ -111,8 +111,9 @@ class AdblockRule(object):
         if self.is_comment:
             self.regex = ''
         elif self.is_html_rule:
-            url, selector = rule_text.split('#@#' if self.is_exception else '##')
-            self.regex, self.html_selector = self.rule_to_regex(rule_text), selector
+            url, selector = self.rule_text.split('#@#' if self.is_exception else '##')
+            self.regex = self.rule_to_regex(url) if url else ''
+            self.html_selector = selector
         else:
             self.regex = self.rule_to_regex(rule_text)
 
