@@ -303,7 +303,7 @@ class AdblockRule(object):
             'b_w': 'whitelist' if self.is_exception else 'blacklist',
             'options': options_text,
             'domains': domain_text,
-            'url': url,
+            'url': url if url not in ['https://', 'http://'] else 'anywhere',
         }
 
         return template.format(**entries)
