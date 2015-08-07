@@ -278,6 +278,10 @@ class AdblockRule(object):
         return "AdblockRule(%r)" % self.raw_rule_text
 
     def __str__(self):
+        if self.is_html_rule:
+            return (('un-hide' if self.is_exception else 'hide')
+                    + ' elements matching CSS selector: {}'.format(self.html_selector))
+
         template = '{b_w}{options} requests{domains} to {url}'
         domain_text = ''
         if 'domain' in self.options:
