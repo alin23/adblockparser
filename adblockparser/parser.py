@@ -291,12 +291,18 @@ class AdblockRule(object):
                 domain_text = domain_text + (' from ' if status else ' not from ') + domain
 
         if self.options:
+            explanations = {
+                    'object-subrequest': 'plugin (i.e. Flash)',
+                    'subdocument': 'embedded page (iframe)',
+                    'document': 'this page',
+            }
             options_text = ''
             for option, status in self.options.items():
                 if option == 'domain':
                     continue
                 else:
-                    options_text = options_text + ('not ' if not status else ' ') + option
+                    options_text = (options_text + ('not ' if not status else ' ') +
+                                    (explanations[option] if option in explanations else option))
         else:
             options_text = ' all'
 
