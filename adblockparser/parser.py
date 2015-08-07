@@ -79,9 +79,9 @@ class AdblockRule(object):
     OPTIONS_SPLIT_PAT = ',(?=~?(?:%s))' % ('|'.join(BINARY_OPTIONS + ["domain"]))
     OPTIONS_SPLIT_RE = re.compile(OPTIONS_SPLIT_PAT)
 
-    __slots__ = ['raw_rule_text', 'is_comment', 'is_html_rule', 'html_selector', 'is_exception',
-                 'raw_options', 'options', '_options_keys', 'rule_text',
-                 'regex', 'regex_re']
+#    __slots__ = ['raw_rule_text', 'is_comment', 'is_html_rule', 'html_selector', 'is_exception',
+#                 'raw_options', 'options', '_options_keys', 'rule_text',
+#                 'regex', 'regex_re']
 
     def __init__(self, rule_text):
         self.raw_rule_text = rule_text
@@ -276,6 +276,33 @@ class AdblockRule(object):
 
     def __repr__(self):
         return "AdblockRule(%r)" % self.raw_rule_text
+
+    def __str__(self):
+        template = '{b_w}{options} requests{domains} to {url}'
+        domain_text = ''
+        if 'domain' in self.options:
+            for domain, status in self.options['domain'].items():
+                domain_text = domain_text + (' from ' if status else ' not from ') + domain
+
+        if self.options:
+            options_text = ''
+            for option, status in self.options.items():
+                if option == 'domain':
+                    continue
+                else:
+                    options_text = options_text + ('not ' if not status else ' ') + option
+        else:
+            options_text = ' all'
+
+        url = ''.join([char for char in self.rule_text if char not in '@|^'])
+        entries = {
+            'b_w': 'whitelist' if self.is_exception else 'blacklist',
+            'options': options_text,
+            'domains': domain_text,
+            'url': url,
+        }
+
+        return template.format(**entries)
 
 
 class AdblockRules(object):
