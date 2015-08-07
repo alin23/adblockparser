@@ -281,6 +281,8 @@ class AdblockRule(object):
         if self.is_html_rule:
             return (('un-hide' if self.is_exception else 'hide')
                     + ' elements matching CSS selector: {}'.format(self.html_selector))
+        elif self.is_comment:
+            return ('Comment: {}'.format(self.rule_text))
 
         template = '{b_w}{options} requests{domains} to {url}'
         domain_text = ''
